@@ -44,7 +44,7 @@ jobs:
       uses: 'google-github-actions/auth@v1'
       with:
         workload_identity_provider: 'projects/27178923013/locations/global/workloadIdentityPools/github-pool'
-        service_account: 'svc-github@rbs-lab.iam.gserviceaccount.com?uid=116012061599780332657'
+        service_account: 'svc-github@rbs-lab.iam.gserviceaccount.com'
 
     # Alternative option - authentication via credentials json
     #    - id: 'auth'
