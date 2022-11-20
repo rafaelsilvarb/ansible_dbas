@@ -64,12 +64,12 @@ jobs:
     # Build the Docker image
     - name: Build
       run: |-
-        docker build -t "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA" .
+        docker build -t "$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA" .
 
     # Push the Docker image to Google Container Registry
     - name: Publish
       run: |-
-        docker push "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
+        docker push "$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
 
     - name: Deploy
       run: |-
