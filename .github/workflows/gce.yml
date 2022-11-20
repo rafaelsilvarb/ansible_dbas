@@ -28,6 +28,7 @@ jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
+    environment: gce_env
 
     # Add "id-token" with the intended permissions.
     permissions:
@@ -62,12 +63,14 @@ jobs:
 
     # Build the Docker image
     - name: Build
-      run: docker build -t $IMAGE_NAME .
+      run: docker build --tag "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA" .
 
     # Push the Docker image to Google Container Registry
     - name: Publish
-      run: docker push $IMAGE_NAME
+      run: docker push "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
 
     - name: Deploy
       run: |-
-        gcloud compute instance-templates create instance-template-1 --project=rbs-lab --machine-type=e2-small --network-interface=network=default,network-tier=PREMIUM --maintenance-policy=MIGRATE --provisioning-model=STANDARD --service-account=27178923013-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --create-disk=auto-delete=yes,boot=yes,device-name=instance-template-1,image=projects/rocky-linux-cloud/global/images/rocky-linux-8-optimized-gcp-v20221102,mode=rw,size=20,type=pd-balanced --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
+        gcloud compute instances update-container "$GCE_INSTANCE" \
+          --zone "$GCE_INSTANCE_ZONE" \
+          --container-image "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
